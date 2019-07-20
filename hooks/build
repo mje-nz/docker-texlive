@@ -1,0 +1,22 @@
+#!/bin/bash
+# Based on https://github.com/vaidik/docker-etcd/
+
+set -e
+
+echo "Working directory: $(pwd)"
+
+build() {
+    echo "Building mjenz/texlive:$TAG"
+    docker build -t "mjenz/texlive:$TAG" \
+      --build-arg BASE_IMAGE=$BASE_IMAGE \
+      --build-arg TEXLIVE_VERSION=$TEXLIVE_VERSION \
+      .
+}
+
+DIR="$(dirname $DOCKERFILE_PATH)"
+source $DIR/hooks/matrix.sh
+while read -r line; do
+    if [ -n "$line" ]; then
+        eval "$line build"
+    fi
+done <<< "$VARS"

@@ -1,0 +1,14 @@
+#!/bin/bash
+# Based on https://github.com/vaidik/docker-etcd/
+
+set -e
+
+docker tag mjenz/texlive:bionic mjenz/texlive:latest
+
+docker images
+
+for i in $(docker images mjenz/texlive --format "{{.Repository}}:{{.Tag}}");
+do
+	echo "Push $i"
+    docker push "$i" || true
+done

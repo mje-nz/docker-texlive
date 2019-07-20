@@ -1,5 +1,5 @@
-ARG IMAGE=ubuntu:bionic
-FROM $IMAGE
+ARG BASE_IMAGE=ubuntu:bionic
+FROM $BASE_IMAGE
 
 # Make sure nothing prompts for input, which definitely happens otherwise for texlive-full
 ENV DEBIAN_FRONTEND=noninteractive
