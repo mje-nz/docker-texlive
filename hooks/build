@@ -9,14 +9,21 @@ source hooks/util.sh
 # Print environment variables apart from Docker Hub deploy key
 ( unset SSH_PRIVATE; trace env )
 
-build() {
-	trace docker build -t "mjenz/texlive:$TAG" \
-		--build-arg BASE_IMAGE=$BASE_IMAGE \
-		--build-arg TEXLIVE_VERSION=$TEXLIVE_VERSION \
-		.
-}
+# The tag from the Docker Hub build rule is passed as $DOCKER_TAG; let's abuse
+# it to split the build up so it doesn't take hours.  This has the advantage
+# of pre-loading the cache with an appropriate image (otherwise it only loads
+# texlive:latest).
+if [ -z "$DOCKER_TAG" ]; then
+    echo "No distro specified"
+    exit 1
+fi
+distro="$DOCKER_TAG"
 
-# Run build() once for each set of variables in matrix.sh
-while read -r line; do
-    eval "$line build"
-done < <(hooks/matrix.sh)
+# Build an image for each TeX Live version
+for texlive_version in "" "minimal" "full" "vanilla" "vanilla-2018"; do
+    tag="$distro${texlive_version:+-$texlive_version}"
+    trace docker build -t "mjenz/texlive:$tag" \
+        --build-arg "BASE_IMAGE=ubuntu:$distro" \
+        --build-arg "TEXLIVE_VERSION=$texlive_version" \
+        .
+done
