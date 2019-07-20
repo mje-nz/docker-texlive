@@ -7,11 +7,15 @@ set -e
 source hooks/util.sh
 
 # Manually tag latest
-docker tag mjenz/texlive:bionic mjenz/texlive:latest
+trace docker tag mjenz/texlive:bionic mjenz/texlive:latest
 
 trace docker images
 
 # Push every image
 for i in $(docker images mjenz/texlive --format "{{.Repository}}:{{.Tag}}"); do
-    trace docker push "$i"
+    if [[ $i != *"<none>" ]]; then
+        # Somehow Docker Hub ends up with mjenz/texlive:<none> and then explodes
+        # if you touch it
+        trace docker push "$i"
+    fi
 done
