@@ -1,14 +1,17 @@
 #!/bin/bash
+# Push phase hook for Docker Hub automated builds
 # Based on https://github.com/vaidik/docker-etcd/
 
 set -e
 
+source hooks/util.sh
+
+# Manually tag latest
 docker tag mjenz/texlive:bionic mjenz/texlive:latest
 
-docker images
+trace docker images
 
-for i in $(docker images mjenz/texlive --format "{{.Repository}}:{{.Tag}}");
-do
-	echo "Push $i"
-    docker push "$i" || true
+# Push every image
+for i in $(docker images mjenz/texlive --format "{{.Repository}}:{{.Tag}}"); do
+    trace docker push "$i"
 done

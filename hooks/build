@@ -1,22 +1,21 @@
 #!/bin/bash
+# Build phase hook for Docker Hub automated builds
 # Based on https://github.com/vaidik/docker-etcd/
 
 set -e
 
-echo "Working directory: $(pwd)"
+source hooks/util.sh
+
+trace env
 
 build() {
-    echo "Building mjenz/texlive:$TAG"
-    docker build -t "mjenz/texlive:$TAG" \
-      --build-arg BASE_IMAGE=$BASE_IMAGE \
-      --build-arg TEXLIVE_VERSION=$TEXLIVE_VERSION \
-      .
+	trace docker build -t "mjenz/texlive:$TAG" \
+		--build-arg BASE_IMAGE=$BASE_IMAGE \
+		--build-arg TEXLIVE_VERSION=$TEXLIVE_VERSION \
+		.
 }
 
-DIR="$(dirname $DOCKERFILE_PATH)"
-source $DIR/hooks/matrix.sh
+# Run build() once for each set of variables in matrix.sh
 while read -r line; do
-    if [ -n "$line" ]; then
-        eval "$line build"
-    fi
-done <<< "$VARS"
+    eval "$line build"
+done < <(hooks/matrix.sh)

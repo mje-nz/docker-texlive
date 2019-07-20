@@ -63,7 +63,3 @@ ENV PATH="${TEXLIVE_PATH}:${PATH}"
 
 ENV HOME /workdir
 WORKDIR /workdir 
-
-# texlive without recommended is 243 MB, doesn't have latexmk
-# texlive texlive-*-doc- is 775 MB
-
