@@ -6,7 +6,8 @@ set -e
 
 source hooks/util.sh
 
-trace env
+# Print environment variables apart from Docker Hub deploy key
+( unset SSH_PRIVATE; trace env )
 
 build() {
 	trace docker build -t "mjenz/texlive:$TAG" \
