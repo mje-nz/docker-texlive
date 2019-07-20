@@ -6,8 +6,8 @@ set -e
 
 source hooks/util.sh
 
-# Manually tag latest
-trace docker tag mjenz/texlive:bionic mjenz/texlive:latest
+# Manually tag latest if possible
+trace docker tag mjenz/texlive:bionic mjenz/texlive:latest || true
 
 trace docker images
 
