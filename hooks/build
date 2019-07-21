@@ -32,6 +32,7 @@ for texlive_version in "" "minimal" "full" "vanilla" "vanilla-2018"; do
         .
 
     # Print versions
+    # TODO: Need a better way of setting TeX Live path so latexmk and pythontex work here
     info "make version:"
     docker run --rm "$name" bash -c "make --version" || true
     info "latexmk version:"
@@ -51,5 +52,5 @@ for texlive_version in "" "minimal" "full" "vanilla" "vanilla-2018"; do
     info "pythontex version:"
     docker run --rm "$name" bash -c "pythontex --version" || true
     info "pythontex3 version:"
-    docker run --rm "$name" bash -c "python3 $(which pythontex) --version" || true
+    docker run --rm "$name" bash -c 'python3 $(which pythontex) --version' || true
 done

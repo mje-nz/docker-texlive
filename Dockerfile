@@ -6,21 +6,29 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install common packages
 RUN apt-get update && \
-    # Basics for building LaTeX documents that aren't necessarily installed otherwise
     apt-get install -qy --no-install-recommends \
-        make  \
-    # Basics for installing Python packages
+        make \
+    # For installing Python packages
         python3 \
         python3-pip \
         python3-setuptools \
         python3-wheel \
-    # Basics for generating Python figures
+    # For pythontex
+        python3-pygments \
+    # For comparing documents
+        ghostscript \
+        imagemagick \
+    # For matplotlib
         fontconfig \
-        python3-numpy \
-        python3-matplotlib \
-        python3-seaborn \
         python3-tk && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    # For generating Python figures (system versions are old)
+    pip3 install --no-cache-dir \
+        matplotlib \
+        numpy \
+        seaborn && \
+    # Allow imagemagick to work with PDFs
+    sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/g' /etc/ImageMagick-6/policy.xml
 
 # Install TeX Live
 ARG TEXLIVE_VERSION
