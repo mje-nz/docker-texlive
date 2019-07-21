@@ -7,7 +7,7 @@ set -e
 source hooks/util.sh
 
 # Print environment variables apart from Docker Hub deploy key
-( unset SSH_PRIVATE; trace env )
+( unset SSH_PRIVATE; trace "env | sort" )
 
 # The tag from the Docker Hub build rule is passed as $DOCKER_TAG; let's abuse
 # it to split the build up so it doesn't take hours.  This has the advantage
