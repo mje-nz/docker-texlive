@@ -22,8 +22,31 @@ distro="$DOCKER_TAG"
 # Build an image for each TeX Live version
 for texlive_version in "" "minimal" "full" "vanilla" "vanilla-2018"; do
     tag="$distro${texlive_version:+-$texlive_version}"
-    trace docker build -t "mjenz/texlive:$tag" \
+    name="mjenz/texlive:$tag"
+    trace docker build -t "$name" \
         --build-arg "BASE_IMAGE=ubuntu:$distro" \
         --build-arg "TEXLIVE_VERSION=$texlive_version" \
         .
+
+    # Print versions
+    info "make version:"
+    docker run --rm "$name" bash -c "make --version" || true
+    info "latexmk version:"
+    docker run --rm "$name" bash -c "latexmk --version" || true
+    info "python version:"
+    docker run --rm "$name" bash -c "python --version" || true
+    info "python2 version:"
+    docker run --rm "$name" bash -c "python2 --version" || true
+    info "python3 version:"
+    docker run --rm "$name" bash -c "python3 --version" || true
+    info "pip3 version:"
+    docker run --rm "$name" bash -c "pip3 --version" || true
+    info "numpy version:"
+    docker run --rm "$name" bash -c "python3 -c 'import numpy; print(numpy.__version__)'" || true
+    info "matplotlib version:"
+    docker run --rm "$name" bash -c "python3 -c 'import matplotlib; print(matplotlib.__version__)'"  || true
+    info "pythontex version:"
+    docker run --rm "$name" bash -c "pythontex --version" || true
+    info "pythontex3 version:"
+    docker run --rm "$name" bash -c "python3 $(which pythontex) --version" || true
 done
