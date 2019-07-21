@@ -4,19 +4,37 @@ FROM $BASE_IMAGE
 # Make sure nothing prompts for input, which definitely happens otherwise for texlive-full
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Install common packages
+RUN apt-get update && \
+    # Basics for building LaTeX documents that aren't necessarily installed otherwise
+    apt-get install -qy --no-install-recommends \
+        make  \
+    # Basics for installing Python packages
+        python3 \
+        python3-pip \
+        python3-setuptools \
+        python3-wheel \
+    # Basics for generating Python figures
+        fontconfig \
+        python3-numpy \
+        python3-matplotlib \
+        python3-seaborn \
+        python3-tk && \
+    rm -rf /var/lib/apt/lists/*
+
 # Install TeX Live
 ARG TEXLIVE_VERSION
 RUN apt-get update && \
     if [ -z "$TEXLIVE_VERSION" ]; then \
         echo "Installing system TeX Live"; \
         apt-get install -qy \
+            latexmk \
             texlive \
             texlive-*-doc-; \
     elif [ "$TEXLIVE_VERSION" = "minimal" ]; then \
         echo "Installing minimal system TeX Live"; \
         apt-get install -qy --no-install-recommends \
             latexmk \
-            make \
             texlive; \
     elif [ "$TEXLIVE_VERSION" = "full" ]; then \
         echo "Installing system TeX Live"; \
@@ -24,8 +42,8 @@ RUN apt-get update && \
     elif [ "$TEXLIVE_VERSION" != "${TEXLIVE_VERSION#vanilla}" ]; then \
         # TEXLIVE_VERSION starts with "vanilla"
         apt-get install -qy --no-install-recommends \
-            latexmk \
-            make \
+            # Needed for tlmgr
+            xzdec \
             # Needed for installer
             perl \
             wget && \
@@ -51,15 +69,33 @@ RUN apt-get update && \
             -repository $TEXLIVE_REPO && \
         # Clean up
         rm -r /install-tl-unx && \
-        rm install-tl-unx.tar.gz; \
+        rm install-tl-unx.tar.gz && \
+        # Add TeX Live to path
+        # TODO: Use ENV somehow
+        echo 'export PATH="'$TEXLIVE_PATH':$PATH"' >> ~/.bashrc && \
+        # Add some extras
+        # TODO separate layer
+        $TEXLIVE_PATH/tlmgr install \
+            caption \
+            currfile \
+            ec \
+            etoolbox \
+            fancyvrb \
+            filehook \
+            fvextra \
+            latexmk \
+            lineno \
+            pgf \
+            pgfopts \
+            pythontex \
+            subfig \
+            upquote \
+            xcolor \
+            xstring; \
     else \
         echo "Unknown TeX Live version $TEXLIVE_VERSION"; \
         exit 1; \
-    fi \
- && rm -rf /var/lib/apt/lists/*
+    fi && \
+    rm -rf /var/lib/apt/lists/*
 
-# Only matters for vanilla texlive
-ENV PATH="${TEXLIVE_PATH}:${PATH}"
-
-ENV HOME /workdir
 WORKDIR /workdir 
