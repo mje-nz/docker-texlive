@@ -24,7 +24,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     # For generating Python figures (system versions are old)
     pip3 install --no-cache-dir \
-        matplotlib \
+        # Last version supported on Xenial (Python 3.5)
+        matplotlib==3.0.3 \
         numpy \
         seaborn && \
     # Allow imagemagick to work with PDFs
