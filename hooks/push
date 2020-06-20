@@ -4,11 +4,12 @@
 
 set -e
 
+source common.sh
 source hooks/util.sh
 
 # Manually tag latest if possible
-trace docker tag mjenz/texlive:bionic mjenz/texlive:latest || true
-
+trace docker tag "mjenz/texlive:$LATEST_UBUNTU" "mjenz/texlive:latest" || true
+trace docker tag "mjenz/texlive:$LATEST_UBUNTU-vanilla-$LATEST_TEXLIVE" "mjenz/texlive:vanilla" || true
 trace docker images
 
 # Push every image

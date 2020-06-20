@@ -1,10 +1,26 @@
 #!/bin/bash
 # Build phase hook for Docker Hub automated builds
+#
+# Configure Docker Hub to build:
+# * Dockerfile with focal
+# * Dockerfile with bionic
+# * Dockerfile with xenial
+# * Dockerfile.vanilla with focal-2020
+# * Dockerfile.vanilla with focal-2019
+# * Dockerfile.vanilla with bionic-2020
+# * Dockerfile.vanilla with bionic-2019
+#
 # Based on https://github.com/vaidik/docker-etcd/
 
 set -e
 
+source common.sh
 source hooks/util.sh
+
+build () {
+    trace docker build -f "$DOCKERFILE_PATH" "$@"
+}
+
 
 # Print environment variables apart from Docker Hub deploy key
 ( unset SSH_PRIVATE; trace "env | sort" )
@@ -17,40 +33,45 @@ if [ -z "$DOCKER_TAG" ]; then
     echo "No distro specified"
     exit 1
 fi
-distro="$DOCKER_TAG"
-if [ "$DOCKER_TAG" == "latest" ]; then
-    distro="bionic"
+# Split on -
+distro=${DOCKER_TAG%-*}
+texlive_version=${DOCKER_TAG#*-}
+
+# Build the base image and tag for vanilla images
+trace docker build -t base \
+    --target base --build-arg "BASE_IMAGE=ubuntu:$distro" .
+
+if [ "$DOCKERFILE_PATH" != "Dockerfile.vanilla" ]; then
+    name="mjenz/texlive:$distro"
+
+    # Build $distro-minimal, $distro, and $distro-full
+    build -t "$name-minimal" \
+        --target minimal --build-arg "BASE_IMAGE=ubuntu:$distro" .
+    print_versions "$name-minimal"
+    build -t "$name" \
+        --target default --build-arg "BASE_IMAGE=ubuntu:$distro" .
+    print_versions "$name"
+    build -t "$name-full" \
+        --target full --build-arg "BASE_IMAGE=ubuntu:$distro" .
+    print_versions "$name-full"
+
+else
+    if [ "$texlive_version" == "$DOCKER_TAG" ]; then
+        echo "Must specify TeX Live version"
+        exit 1
+    fi
+    name="mjenz/texlive:$distro-vanilla-$texlive_version"
+
+    # Build $distro-vanilla-$year and $distro-vanilla-$year-full using tagged base image
+    build -t "$name" \
+        --target basic --build-arg "TEXLIVE_VERSION=$texlive_version" .
+    print_versions "$name"
+    build -t "$name-full" \
+        --target full --build-arg "TEXLIVE_VERSION=$texlive_version" .
+    print_versions "$name-full"
+
+    # If this is the latest TeX Live version, add short tag
+    if [ "$texlive_version" == "$LATEST_TEXLIVE" ]; then
+        trace docker tag "$name" "mjenz/texlive:$distro-vanilla"
+    fi
 fi
-
-# Build an image for each TeX Live version
-for texlive_version in "" "minimal" "full" "vanilla" "vanilla-2018"; do
-    tag="$distro${texlive_version:+-$texlive_version}"
-    name="mjenz/texlive:$tag"
-    trace docker build -t "$name" \
-        --build-arg "BASE_IMAGE=ubuntu:$distro" \
-        --build-arg "TEXLIVE_VERSION=$texlive_version" \
-        .
-
-    # Print versions
-    # TODO: Need a better way of setting TeX Live path so latexmk and pythontex work here
-    info "make version:"
-    docker run --rm "$name" bash -c "make --version" || true
-    info "latexmk version:"
-    docker run --rm "$name" bash -c "latexmk --version" || true
-    info "python version:"
-    docker run --rm "$name" bash -c "python --version" || true
-    info "python2 version:"
-    docker run --rm "$name" bash -c "python2 --version" || true
-    info "python3 version:"
-    docker run --rm "$name" bash -c "python3 --version" || true
-    info "pip3 version:"
-    docker run --rm "$name" bash -c "pip3 --version" || true
-    info "numpy version:"
-    docker run --rm "$name" bash -c "python3 -c 'import numpy; print(numpy.__version__)'" || true
-    info "matplotlib version:"
-    docker run --rm "$name" bash -c "python3 -c 'import matplotlib; print(matplotlib.__version__)'"  || true
-    info "pythontex version:"
-    docker run --rm "$name" bash -c "pythontex --version" || true
-    info "pythontex3 version:"
-    docker run --rm "$name" bash -c 'python3 $(which pythontex) --version' || true
-done

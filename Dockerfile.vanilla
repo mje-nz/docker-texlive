@@ -1,0 +1,68 @@
+# Requires base image from main Dockerfile to be tagged as "base"
+FROM base as basic
+
+# Install vanilla TeX Live with basic scheme
+ARG TEXLIVE_VERSION
+RUN apt-get update && \
+    apt-get install -qy --no-install-recommends \
+        # Needed for tlmgr
+        xzdec \
+        # Needed for installer
+        perl \
+        wget && \
+    rm -rf /var/lib/apt/lists/* && \
+    source common.sh && \
+    if [ -z "$TEXLIVE_VERSION" || "$TEXLIVE_VERSION" == "$LATEST_TEXLIVE" ]; then \
+        echo "Getting installer for latest vanilla TeX Live"; \
+        export TEXLIVE_REPO="http://mirror.ctan.org/systems/texlive/tlnet"; \
+        export TEXLIVE_PATH="/usr/local/texlive/$LATEST_TEXLIVE/bin/x86_64-linux"; \
+    else \
+        echo "Getting installer for TeX Live $TEXLIVE_VERSION"; \
+        export TEXLIVE_REPO="http://ftp.math.utah.edu/pub/tex/historic/systems/texlive/$TEXLIVE_VERSION/tlnet-final"; \
+        export TEXLIVE_PATH="/usr/local/texlive/$TEXLIVE_VERSION/bin/x86_64-linux"; \
+    fi && \
+    cd /tmp && \
+    wget -nv $TEXLIVE_REPO/install-tl-unx.tar.gz && \
+    # Extract installer into generically-named folder
+    mkdir install-tl-unx && \
+    tar -xf install-tl-unx.tar.gz -C install-tl-unx --strip-components=1 && \
+    # Select scheme and install
+    echo "selected_scheme scheme-basic" >> install-tl-unx/texlive.profile && \
+    echo "Running installer with basic scheme" && \
+    install-tl-unx/install-tl \
+        -profile install-tl-unx/texlive.profile \
+        -repository $TEXLIVE_REPO && \
+    # Clean up
+    rm -r /tmp/install-tl-unx && \
+    rm install-tl-unx.tar.gz && \
+    # Add some extra packages
+    $TEXLIVE_PATH/tlmgr install \
+        caption \
+        currfile \
+        ec \
+        etoolbox \
+        fancyvrb \
+        filehook \
+        fvextra \
+        latexmk \
+        lineno \
+        pgf \
+        pgfopts \
+        pythontex \
+        subfig \
+        upquote \
+        xcolor \
+        xstring && \
+    # Add TeX Live binaries to path
+    echo "export PATH=\"$TEXLIVE_PATH:\$PATH\"" >> /etc/profile.d/02-texlive.sh
+
+# Load /etc/profile in non-interactive shells
+ENV BASH_ENV "/etc/profile"
+
+
+
+# Install vanilla TeX Live with full scheme
+FROM basic as full
+# Run commands are hardcoded as "sh -c" which doesn't respect BASH_ENV, so call
+# bash manually to load path
+RUN bash -c "tlmgr install scheme-full"
