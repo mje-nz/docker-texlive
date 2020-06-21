@@ -1,19 +1,19 @@
-# Tex Live Docker image
-
+# TeX Live Docker image
 This repo builds a series of TeX Live images.
-Each variant is available for `focal`, `bionic`, and `xenial`, and consists of an Ubuntu base image with system Python 3 and matplotlib, numpy and seaborn from pip.
+There is a CI pipeline which does a clean build once a week.
+Each variant is available for `focal`, `bionic`, and `xenial`, and consists of an Ubuntu base image with system Python 3 and the latest matplotlib, numpy, and seaborn from pip.
 
-Variants:
+Image variants:
 
 * **`$distro-minimal`**: `ubuntu:$distro` with TeX Live installed through apt without recommended packages
 * **`$distro`**: `$distro-minimal` plus recommended packages
-* **`$distro-vanilla`**: `ubuntu:$distro` with vanilla TeX live installed using the `basic` scheme plus some extra packages
-* **`$distro-vanilla-full`**, : `ubuntu:$distro` with vanilla TeX Live installed using the `full` scheme
-* **`$distro-vanilla-2019`**: same as `$distro-vanilla` but with TeX Live 2019
-* **`$distro-vanilla-2019-full`**: same as `$distro-vanilla-full` but with TeX Live 2019
+* **`$distro-full`**: `ubuntu:$distro` with a the `texlive-full` package
+* **`$distro-vanilla-$year`**: `ubuntu:$distro` with vanilla TeX live `$year` installed using the `basic` scheme plus some extra packages
+* **`$distro-vanilla-$year-full`**: `ubuntu:$distro` with vanilla TeX Live `$year` installed using the `full` scheme
 
-Abbreviated tags:
+Short tags:
 
 * **`latest`** is `focal`
 * **`$distro-vanilla`** is `$distro-vanilla-2020`
+* **`$distro-vanilla-full`** is `$distro-vanilla-2020-full`
 * **`vanilla`** is `focal-vanilla`
