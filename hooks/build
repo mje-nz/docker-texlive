@@ -24,26 +24,26 @@ if [ -z "$TEXLIVE_VERSION" ]; then
     name="mjenz/texlive:$DISTRO"
     trace docker build -t "$name-minimal" \
         --target minimal --build-arg "BASE_IMAGE=ubuntu:$DISTRO" .
-    print_versions "$name-minimal"
     trace docker build -t "$name" \
         --target default --build-arg "BASE_IMAGE=ubuntu:$DISTRO" .
-    print_versions "$name"
     trace docker build -t "$name-full" \
         --target full --build-arg "BASE_IMAGE=ubuntu:$DISTRO" .
+    print_versions "$name-minimal"
+    print_versions "$name"
     print_versions "$name-full"
-
 else
     # Build $DISTRO-vanilla-$year and $DISTRO-vanilla-$year-full using tagged base image
     name="mjenz/texlive:$DISTRO-vanilla-$TEXLIVE_VERSION"
     trace docker build -t "$name" -f Dockerfile.vanilla \
         --target basic --build-arg "TEXLIVE_VERSION=$TEXLIVE_VERSION" .
-    print_versions "$name"
     trace docker build -t "$name-full" -f Dockerfile.vanilla \
         --target full --build-arg "TEXLIVE_VERSION=$TEXLIVE_VERSION" .
-    print_versions "$name-full"
 
     # If this is the latest TeX Live version, add short tag
     if [ "$TEXLIVE_VERSION" == "$LATEST_TEXLIVE" ]; then
         trace docker tag "$name" "mjenz/texlive:$DISTRO-vanilla"
     fi
+
+    print_versions "$name"
+    print_versions "$name-full"
 fi

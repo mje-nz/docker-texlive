@@ -15,5 +15,9 @@ jobs:
         DISTRO: ${{ matrix.distro }}
         TEXLIVE_VERSION: ${{ matrix.texlive_version }}
       working-directory: .
-      run: |
-        hooks/build
+      run: hooks/build
+    - uses: azure/docker-login@v1
+      with:
+        username: mjenz
+        password: ${{ secrets.DOCKERIO_PASSWORD }}
+    - run: hooks/push
