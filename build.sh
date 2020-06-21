@@ -45,5 +45,5 @@ get_tag_from_arguments() {
 # Print versions, except when building the base image
 tag="$(get_tag_from_arguments "$@")"
 if [[ -n "$NAME" && "$tag" == "$NAME"* ]]; then
-    print_versions "$NAME"
+    print_versions "$tag"
 fi

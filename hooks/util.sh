@@ -22,7 +22,8 @@ print_versions() {
     error () { echo "$RED\$*$CLEAR" ; }
     ver () { eval "\$@" 2>/dev/null || error "none" ; }
 
-    info "For \"$1\":"
+    echo
+    info "Versions in \"$1\":"
 
     info "tex version"
     tex --version | head -n 2

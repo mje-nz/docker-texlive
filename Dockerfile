@@ -45,7 +45,9 @@ RUN apt-get update && \
 FROM base AS default
 RUN apt-get update && \
     echo "Installing system TeX Live" && \
-    apt-get install -qy texlive && \
+    apt-get install -qy \
+        latexmk \
+        texlive && \
     rm -rf /var/lib/apt/lists/*
 
 
