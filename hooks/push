@@ -7,9 +7,10 @@ set -e
 source common.sh
 source hooks/util.sh
 
-# Manually tag latest if possible
+# Add short tags if possible
 trace docker tag "mjenz/texlive:$LATEST_UBUNTU" "mjenz/texlive:latest" || true
-trace docker tag "mjenz/texlive:$LATEST_UBUNTU-vanilla-$LATEST_TEXLIVE" "mjenz/texlive:vanilla" || true
+trace docker tag "mjenz/texlive:$DISTRO-vanilla-$TEXLIVE_VERSION" "mjenz/texlive:$DISTRO-vanilla" || true
+trace docker tag "mjenz/texlive:$LATEST_UBUNTU-vanilla" "mjenz/texlive:vanilla" || true
 trace docker images mjenz/texlive
 
 # Push every image

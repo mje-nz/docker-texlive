@@ -17,39 +17,34 @@ if [ -n "$TEXLIVE_VERSION" ]; then
 fi
 
 if [ "$GITHUB_EVENT_NAME" = "push" ]; then
-    # Pull previous image to speed up build, but do clean builds for "schedule" events
+    # Pull previous image to speed up build, but do clean builds for "schedule" events.
+    # See https://andrewlock.net/caching-docker-layers-on-serverless-build-hosts-with-multi-stage-builds---target,-and---cache-from/
+    # for --cache-from explanation.
     trace docker pull "$name-full" || true
 fi
 
+build () {
+    trace docker build --cache-from "$name-full" \
+        --build-arg "BASE_IMAGE=ubuntu:$DISTRO" \
+        --build-arg "TEXLIVE_VERSION=$TEXLIVE_VERSION" \
+        "$@"
+}
+
 # Build the base image, and tag for vanilla images
-trace docker build -t base \
-    --target base --build-arg "BASE_IMAGE=ubuntu:$DISTRO" .
+build -t base --target base .
 
 if [ -z "$TEXLIVE_VERSION" ]; then
     # Build $DISTRO-minimal, $DISTRO, and $DISTRO-full
-    trace docker pull "$name-full" || true
-    trace docker build -t "$name-minimal" \
-        --target minimal --build-arg "BASE_IMAGE=ubuntu:$DISTRO" .
-    trace docker build -t "$name" \
-        --target default --build-arg "BASE_IMAGE=ubuntu:$DISTRO" .
-    trace docker build -t "$name-full" \
-        --target full --build-arg "BASE_IMAGE=ubuntu:$DISTRO" .
+    build -t "$name-minimal" --target minimal .
+    build -t "$name" --target default .
+    build -t "$name-full" --target full .
     print_versions "$name-minimal"
     print_versions "$name"
     print_versions "$name-full"
 else
     # Build $DISTRO-vanilla-$year and $DISTRO-vanilla-$year-full using tagged base image
-    trace docker pull "$name-full" || true
-    trace docker build -t "$name" -f Dockerfile.vanilla \
-        --target basic --build-arg "TEXLIVE_VERSION=$TEXLIVE_VERSION" .
-    trace docker build -t "$name-full" -f Dockerfile.vanilla \
-        --target full --build-arg "TEXLIVE_VERSION=$TEXLIVE_VERSION" .
-
-    # If this is the latest TeX Live version, add short tag
-    if [ "$TEXLIVE_VERSION" == "$LATEST_TEXLIVE" ]; then
-        trace docker tag "$name" "mjenz/texlive:$DISTRO-vanilla"
-    fi
-
+    build -f Dockerfile.vanilla -t "$name" --target basic .
+    build -f Dockerfile.vanilla -t "$name-full" --target full .
     print_versions "$name"
     print_versions "$name-full"
 fi
