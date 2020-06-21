@@ -7,21 +7,59 @@ on:
     - cron:  '0 0 * * 0'
 
 jobs:
-  build:
+  system:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         distro: [xenial, bionic, focal]
-        texlive_version: ['', 2019, 2020]
     env:
-        DISTRO: ${{ matrix.distro }}
-        TEXLIVE_VERSION: ${{ matrix.texlive_version }}
+      DISTRO: ${{ matrix.distro }}
+      NAME: mjenz/texlive:${{ matrix.distro }}
     steps:
-    - run: env | sort
-    - uses: actions/checkout@v2
-    - run: hooks/build
-    - uses: azure/docker-login@v1
+    - name: Display environment
+      run: env | sort
+    - name: Check out
+      uses: actions/checkout@v2
+    - name: Log in to Docker Hub
+      uses: azure/docker-login@v1
       with:
         username: mjenz
         password: ${{ secrets.DOCKERIO_PASSWORD }}
+
+    - name: Pull previous image for cache
+      if: github.event_name == 'push'
+      run: docker pull "$NAME-full"
+    - run: ./build.sh -t "$NAME-minimal" --target minimal .
+    - run: ./build.sh -t "$NAME" --target default .
+    - run: ./build.sh -t "$NAME-full" --target full .
+    - run: hooks/push
+
+  vanilla:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro: [xenial, bionic, focal]
+        texlive_version: [2019, 2020]
+    env:
+        DISTRO: ${{ matrix.distro }}
+        TEXLIVE_VERSION: ${{ matrix.texlive_version }}
+        NAME: mjenz/texlive:${{ matrix.distro }}-vanilla-${{ matrix.texlive_version }}
+    steps:
+    - name: Display environment
+      run: env | sort
+    - name: Check out
+      uses: actions/checkout@v2
+    - name: Log in to Docker Hub
+      uses: azure/docker-login@v1
+      with:
+        username: mjenz
+        password: ${{ secrets.DOCKERIO_PASSWORD }}
+
+    - name: Pull previous image for cache
+      if: github.event_name == 'push'
+      run: docker pull "$NAME-full"
+    - name: Build base image
+      run: ./build.sh -t base --target base .
+    - run: ./build.sh -f Dockerfile.vanilla -t "$NAME" --target basic .
+    - run: ./build.sh -f Dockerfile.vanilla -t "$NAME-full" --target full .
     - run: hooks/push
