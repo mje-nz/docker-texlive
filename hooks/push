@@ -10,7 +10,7 @@ source hooks/util.sh
 # Manually tag latest if possible
 trace docker tag "mjenz/texlive:$LATEST_UBUNTU" "mjenz/texlive:latest" || true
 trace docker tag "mjenz/texlive:$LATEST_UBUNTU-vanilla-$LATEST_TEXLIVE" "mjenz/texlive:vanilla" || true
-trace docker images
+trace docker images mjenz/texlive
 
 # Push every image
 for i in $(docker images mjenz/texlive --format "{{.Repository}}:{{.Tag}}"); do

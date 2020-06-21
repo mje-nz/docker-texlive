@@ -8,19 +8,18 @@ on:
 
 jobs:
   build:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         distro: [xenial, bionic, focal]
         texlive_version: ['', 2019, 2020]
-    runs-on: ubuntu-latest
+    env:
+        DISTRO: ${{ matrix.distro }}
+        TEXLIVE_VERSION: ${{ matrix.texlive_version }}
     steps:
     - run: env | sort
     - uses: actions/checkout@v2
-    - env:
-        DISTRO: ${{ matrix.distro }}
-        TEXLIVE_VERSION: ${{ matrix.texlive_version }}
-      working-directory: .
-      run: hooks/build
+    - run: hooks/build
     - uses: azure/docker-login@v1
       with:
         username: mjenz
