@@ -1,11 +1,10 @@
 #!/bin/bash
-# Push phase hook for Docker Hub automated builds
-# Based on https://github.com/vaidik/docker-etcd/
+# Push all mjenz/texlive images
 
 set -e
 
 source common.sh
-source hooks/util.sh
+source util.sh
 
 # Add short tags if possible
 trace docker tag "mjenz/texlive:$LATEST_UBUNTU" "mjenz/texlive:latest" || true

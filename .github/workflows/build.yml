@@ -32,7 +32,7 @@ jobs:
     - run: ./build.sh -t "$NAME-minimal" --target minimal .
     - run: ./build.sh -t "$NAME" --target default .
     - run: ./build.sh -t "$NAME-full" --target full .
-    - run: hooks/push
+    - run: ./push-all.sh
 
   vanilla:
     runs-on: ubuntu-latest
@@ -62,4 +62,4 @@ jobs:
       run: ./build.sh -t base --target base .
     - run: ./build.sh -f Dockerfile.vanilla -t "$NAME" --target basic .
     - run: ./build.sh -f Dockerfile.vanilla -t "$NAME-full" --target full .
-    - run: hooks/push
+    - run: ./push-all.sh

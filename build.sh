@@ -4,7 +4,7 @@
 
 set -e
 
-source hooks/util.sh
+source util.sh
 
 if [ -z "$DISTRO" ]; then
     echo "Must specify DISTRO"
