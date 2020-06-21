@@ -59,6 +59,8 @@ print_versions() {
     ver pythontex --version
     info "pythontex3 version:"
     ver python3 $(command -v pythontex) --version
+    echo
+    echo
 EOF
 true
 }

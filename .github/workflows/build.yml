@@ -1,6 +1,10 @@
 name: Build Docker images
 
-on: push
+on:
+  push:
+  schedule:
+    # Every Sunday
+    - cron:  '0 0 * * 0'
 
 jobs:
   build:
@@ -10,6 +14,7 @@ jobs:
         texlive_version: ['', 2019, 2020]
     runs-on: ubuntu-latest
     steps:
+    - run: env | sort
     - uses: actions/checkout@v2
     - env:
         DISTRO: ${{ matrix.distro }}

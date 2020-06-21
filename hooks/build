@@ -11,9 +11,15 @@ source common.sh
 source hooks/util.sh
 
 
-# Print environment variables
-trace "env | sort"
-trace ls
+name="mjenz/texlive:$DISTRO"
+if [ -n "$TEXLIVE_VERSION" ]; then
+    name="$name-vanilla-$TEXLIVE_VERSION"
+fi
+
+if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+    # Pull previous image to speed up build, but do clean builds for "schedule" events
+    trace docker pull "$name-full" || true
+fi
 
 # Build the base image, and tag for vanilla images
 trace docker build -t base \
@@ -21,7 +27,7 @@ trace docker build -t base \
 
 if [ -z "$TEXLIVE_VERSION" ]; then
     # Build $DISTRO-minimal, $DISTRO, and $DISTRO-full
-    name="mjenz/texlive:$DISTRO"
+    trace docker pull "$name-full" || true
     trace docker build -t "$name-minimal" \
         --target minimal --build-arg "BASE_IMAGE=ubuntu:$DISTRO" .
     trace docker build -t "$name" \
@@ -33,7 +39,7 @@ if [ -z "$TEXLIVE_VERSION" ]; then
     print_versions "$name-full"
 else
     # Build $DISTRO-vanilla-$year and $DISTRO-vanilla-$year-full using tagged base image
-    name="mjenz/texlive:$DISTRO-vanilla-$TEXLIVE_VERSION"
+    trace docker pull "$name-full" || true
     trace docker build -t "$name" -f Dockerfile.vanilla \
         --target basic --build-arg "TEXLIVE_VERSION=$TEXLIVE_VERSION" .
     trace docker build -t "$name-full" -f Dockerfile.vanilla \
