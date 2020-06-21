@@ -1,0 +1,19 @@
+name: Build Docker images
+
+on: push
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        distro: [xenial, bionic, focal]
+        texlive_version: ['', 2019, 2020]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - env:
+        DISTRO: ${{ matrix.distro }}
+        TEXLIVE_VERSION: ${{ matrix.texlive_version }}
+      working-directory: .
+      run: |
+        hooks/build

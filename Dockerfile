@@ -50,15 +50,6 @@ RUN apt-get update && \
 
 
 
-# System TeX Live (full minus a few big packages)
-FROM base AS default
-RUN apt-get update && \
-    echo "Installing system TeX Live" && \
-    apt-get install -qy texlive && \
-    rm -rf /var/lib/apt/lists/*
-
-
-
 # System TeX Live (full)
 FROM base AS full
 RUN apt-get update && \

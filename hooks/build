@@ -1,77 +1,49 @@
 #!/bin/bash
 # Build phase hook for Docker Hub automated builds
 #
-# Configure Docker Hub to build:
-# * Dockerfile with focal
-# * Dockerfile with bionic
-# * Dockerfile with xenial
-# * Dockerfile.vanilla with focal-2020
-# * Dockerfile.vanilla with focal-2019
-# * Dockerfile.vanilla with bionic-2020
-# * Dockerfile.vanilla with bionic-2019
+# Expects DISTRO and TEXLIVE_VERSION
 #
-# Based on https://github.com/vaidik/docker-etcd/
+# Orinally based on https://github.com/vaidik/docker-etcd/
 
 set -e
 
 source common.sh
 source hooks/util.sh
 
-build () {
-    trace docker build -f "$DOCKERFILE_PATH" "$@"
-}
 
+# Print environment variables
+trace "env | sort"
+trace ls
 
-# Print environment variables apart from Docker Hub deploy key
-( unset SSH_PRIVATE; trace "env | sort" )
-
-# The tag from the Docker Hub build rule is passed as $DOCKER_TAG; let's abuse
-# it to split the build up so it doesn't take hours.  This has the advantage
-# of pre-loading the cache with an appropriate image (otherwise it only loads
-# texlive:latest).
-if [ -z "$DOCKER_TAG" ]; then
-    echo "No distro specified"
-    exit 1
-fi
-# Split on -
-distro=${DOCKER_TAG%-*}
-texlive_version=${DOCKER_TAG#*-}
-
-# Build the base image and tag for vanilla images
+# Build the base image, and tag for vanilla images
 trace docker build -t base \
-    --target base --build-arg "BASE_IMAGE=ubuntu:$distro" .
+    --target base --build-arg "BASE_IMAGE=ubuntu:$DISTRO" .
 
-if [ "$DOCKERFILE_PATH" != "Dockerfile.vanilla" ]; then
-    name="mjenz/texlive:$distro"
-
-    # Build $distro-minimal, $distro, and $distro-full
-    build -t "$name-minimal" \
-        --target minimal --build-arg "BASE_IMAGE=ubuntu:$distro" .
+if [ -z "$TEXLIVE_VERSION" ]; then
+    # Build $DISTRO-minimal, $DISTRO, and $DISTRO-full
+    name="mjenz/texlive:$DISTRO"
+    trace docker build -t "$name-minimal" \
+        --target minimal --build-arg "BASE_IMAGE=ubuntu:$DISTRO" .
     print_versions "$name-minimal"
-    build -t "$name" \
-        --target default --build-arg "BASE_IMAGE=ubuntu:$distro" .
+    trace docker build -t "$name" \
+        --target default --build-arg "BASE_IMAGE=ubuntu:$DISTRO" .
     print_versions "$name"
-    build -t "$name-full" \
-        --target full --build-arg "BASE_IMAGE=ubuntu:$distro" .
+    trace docker build -t "$name-full" \
+        --target full --build-arg "BASE_IMAGE=ubuntu:$DISTRO" .
     print_versions "$name-full"
 
 else
-    if [ "$texlive_version" == "$DOCKER_TAG" ]; then
-        echo "Must specify TeX Live version"
-        exit 1
-    fi
-    name="mjenz/texlive:$distro-vanilla-$texlive_version"
-
-    # Build $distro-vanilla-$year and $distro-vanilla-$year-full using tagged base image
-    build -t "$name" \
-        --target basic --build-arg "TEXLIVE_VERSION=$texlive_version" .
+    # Build $DISTRO-vanilla-$year and $DISTRO-vanilla-$year-full using tagged base image
+    name="mjenz/texlive:$DISTRO-vanilla-$TEXLIVE_VERSION"
+    trace docker build -t "$name" -f Dockerfile.vanilla \
+        --target basic --build-arg "TEXLIVE_VERSION=$TEXLIVE_VERSION" .
     print_versions "$name"
-    build -t "$name-full" \
-        --target full --build-arg "TEXLIVE_VERSION=$texlive_version" .
+    trace docker build -t "$name-full" -f Dockerfile.vanilla \
+        --target full --build-arg "TEXLIVE_VERSION=$TEXLIVE_VERSION" .
     print_versions "$name-full"
 
     # If this is the latest TeX Live version, add short tag
-    if [ "$texlive_version" == "$LATEST_TEXLIVE" ]; then
-        trace docker tag "$name" "mjenz/texlive:$distro-vanilla"
+    if [ "$TEXLIVE_VERSION" == "$LATEST_TEXLIVE" ]; then
+        trace docker tag "$name" "mjenz/texlive:$DISTRO-vanilla"
     fi
 fi

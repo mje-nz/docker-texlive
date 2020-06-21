@@ -3,6 +3,7 @@ FROM base as basic
 
 # Install vanilla TeX Live with basic scheme
 ARG TEXLIVE_VERSION
+COPY common.sh /tmp/
 RUN apt-get update && \
     apt-get install -qy --no-install-recommends \
         # Needed for tlmgr
@@ -11,8 +12,9 @@ RUN apt-get update && \
         perl \
         wget && \
     rm -rf /var/lib/apt/lists/* && \
-    source common.sh && \
-    if [ -z "$TEXLIVE_VERSION" || "$TEXLIVE_VERSION" == "$LATEST_TEXLIVE" ]; then \
+    cd /tmp && \
+    . ./common.sh && \
+    if [ -z "$TEXLIVE_VERSION" -o "$TEXLIVE_VERSION" = "$LATEST_TEXLIVE" ]; then \
         echo "Getting installer for latest vanilla TeX Live"; \
         export TEXLIVE_REPO="http://mirror.ctan.org/systems/texlive/tlnet"; \
         export TEXLIVE_PATH="/usr/local/texlive/$LATEST_TEXLIVE/bin/x86_64-linux"; \
@@ -21,7 +23,6 @@ RUN apt-get update && \
         export TEXLIVE_REPO="http://ftp.math.utah.edu/pub/tex/historic/systems/texlive/$TEXLIVE_VERSION/tlnet-final"; \
         export TEXLIVE_PATH="/usr/local/texlive/$TEXLIVE_VERSION/bin/x86_64-linux"; \
     fi && \
-    cd /tmp && \
     wget -nv $TEXLIVE_REPO/install-tl-unx.tar.gz && \
     # Extract installer into generically-named folder
     mkdir install-tl-unx && \
@@ -33,7 +34,7 @@ RUN apt-get update && \
         -profile install-tl-unx/texlive.profile \
         -repository $TEXLIVE_REPO && \
     # Clean up
-    rm -r /tmp/install-tl-unx && \
+    rm -r /tmp/install-tl-unx /tmp/common.sh && \
     rm install-tl-unx.tar.gz && \
     # Add some extra packages
     $TEXLIVE_PATH/tlmgr install \
