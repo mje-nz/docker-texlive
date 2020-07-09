@@ -27,17 +27,27 @@ RUN apt-get update && \
     # Extract installer into generically-named folder
     mkdir install-tl-unx && \
     tar -xf install-tl-unx.tar.gz -C install-tl-unx --strip-components=1 && \
-    # Select scheme and install
-    echo "selected_scheme scheme-basic" >> install-tl-unx/texlive.profile && \
+    # Don't install source or documentation
+    echo "tlpdbopt_install_docfiles 0" >> install-tl-unx/texlive.profile && \
+    echo "tlpdbopt_install_srcfiles 0" >> install-tl-unx/texlive.profile && \
+    # Skip making backups when installing to (maybe) speed up build a bit
+    echo "tlpdbopt_autobackup 0" >> install-tl-unx/texlive.profile && \
+    # Link binaries into path
+    echo "instopt_adjustpath 1" >> install-tl-unx/texlive.profile && \
+    echo "tlpdbopt_sys_bin /usr/local/bin" >> install-tl-unx/texlive.profile && \
+    # Silence annoying error
+    export TEXLIVE_INSTALL_ENV_NOCHECK=1 && \
+    # Install TeX live with basic scheme
     echo "Running installer with basic scheme" && \
     install-tl-unx/install-tl \
+        -scheme basic \
         -profile install-tl-unx/texlive.profile \
         -repository $TEXLIVE_REPO && \
     # Clean up
     rm -r /tmp/install-tl-unx /tmp/common.sh && \
     rm install-tl-unx.tar.gz && \
     # Add some extra packages
-    $TEXLIVE_PATH/tlmgr install \
+    tlmgr install \
         caption \
         currfile \
         ec \
@@ -53,17 +63,12 @@ RUN apt-get update && \
         subfig \
         upquote \
         xcolor \
-        xstring && \
-    # Add TeX Live binaries to path
-    echo "export PATH=\"$TEXLIVE_PATH:\$PATH\"" >> /etc/profile.d/02-texlive.sh
-
-# Load /etc/profile in non-interactive shells
-ENV BASH_ENV "/etc/profile"
-
+        xstring
 
 
 # Install vanilla TeX Live with full scheme
 FROM basic as full
-# Run commands are hardcoded as "sh -c" which doesn't respect BASH_ENV, so call
-# bash manually to load path
-RUN bash -c "tlmgr install scheme-full"
+
+# Some packages (ConTeXt) fail to install when relying on symlinks
+RUN export PATH="$(ls -d /usr/local/texlive/*/bin/x86_64-linux/):$PATH" && \
+    tlmgr install scheme-full
