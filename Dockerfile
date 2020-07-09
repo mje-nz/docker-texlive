@@ -19,12 +19,8 @@ RUN apt-get update && \
         fontconfig \
         python3-tk && \
     rm -rf /var/lib/apt/lists/* && \
-    # For generating Python figures (system versions are old)
-    pip3 install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip3 install --no-cache-dir \
-        matplotlib \
-        numpy \
-        seaborn
+    # (system versions are old)
+    pip3 install --no-cache-dir --upgrade pip setuptools wheel
 
 WORKDIR /workdir
 
