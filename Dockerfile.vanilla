@@ -9,6 +9,7 @@ RUN apt-get update && \
         # Needed for tlmgr
         xzdec \
         # Needed for installer
+        gnupg \
         perl \
         wget && \
     rm -rf /var/lib/apt/lists/* && \
@@ -43,9 +44,6 @@ RUN apt-get update && \
         -scheme basic \
         -profile install-tl-unx/texlive.profile \
         -repository $TEXLIVE_REPO && \
-    # Clean up
-    rm -r /tmp/install-tl-unx /tmp/common.sh && \
-    rm install-tl-unx.tar.gz && \
     # Add some extra packages
     tlmgr install \
         caption \
@@ -63,7 +61,10 @@ RUN apt-get update && \
         subfig \
         upquote \
         xcolor \
-        xstring
+        xstring && \
+    # Clean up
+    rm -r /tmp/install-tl-unx /tmp/common.sh && \
+    rm install-tl-unx.tar.gz
 
 
 # Install vanilla TeX Live with full scheme
