@@ -10,6 +10,7 @@ jobs:
   system:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         distro: [xenial, bionic, focal]
     env:
@@ -37,6 +38,7 @@ jobs:
   vanilla:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         distro: [xenial, bionic, focal]
         texlive_version: [2019, 2020]
