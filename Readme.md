@@ -17,8 +17,12 @@ Image variants:
 
 Short tags:
 
+* **`basic`** is `focal-basic`
 * **`latest`** is `focal`
+* **`full`** is `focal-full`
+* **`vanilla-basic`** is `focal-vanilla-2020-basic`
 * **`vanilla`** is `focal-vanilla-2020`
+* **`vanilla-full`** is `focal-vanilla-2020-full`
 * **`$distro-vanilla-basic`** is `$distro-vanilla-2020-basic`
 * **`$distro-vanilla`** is `$distro-vanilla-2020`
 * **`$distro-vanilla-full`** is `$distro-vanilla-2020-full`
