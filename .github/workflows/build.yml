@@ -63,5 +63,5 @@ jobs:
     - name: Build base image
       run: ./build.sh -t base --target base .
     - run: ./build.sh -f Dockerfile.vanilla -t "$NAME" --target basic .
-    - run: ./build.sh -f Dockerfile.vanilla -t "$NAME-full" --target full .
+    - run: ./build.sh -f Dockerfile.vanilla -t "$NAME-full" --target full --cache-from "$NAME" .
     - run: ./push-all.sh
