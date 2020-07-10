@@ -30,7 +30,7 @@ jobs:
     - name: Pull previous image for cache
       if: github.event_name == 'push'
       run: docker pull "$NAME-full"
-    - run: ./build.sh -t "$NAME-minimal" --target minimal .
+    - run: ./build.sh -t "$NAME-basic" --target basic .
     - run: ./build.sh -t "$NAME" --target default .
     - run: ./build.sh -t "$NAME-full" --target full .
     - run: ./push-all.sh
@@ -62,6 +62,7 @@ jobs:
       run: docker pull "$NAME-full"
     - name: Build base image
       run: ./build.sh -t base --target base .
-    - run: ./build.sh -f Dockerfile.vanilla -t "$NAME" --target basic .
+    - run: ./build.sh -f Dockerfile.vanilla -t "$NAME-basic" --target basic .
+    - run: ./build.sh -f Dockerfile.vanilla -t "$NAME" --target default .
     - run: ./build.sh -f Dockerfile.vanilla -t "$NAME-full" --target full --cache-from "$NAME" .
     - run: ./push-all.sh

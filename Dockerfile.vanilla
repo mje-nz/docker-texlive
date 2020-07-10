@@ -65,8 +65,29 @@ RUN apt-get update && \
     rm install-tl-unx.tar.gz
 
 
-# Install vanilla TeX Live with full scheme
-FROM basic as full
+# Install everything except extra fonts, non-English languages, and non-LaTeX processors
+FROM basic as default
+RUN tlmgr install \
+    collection-bibtexextra \
+    collection-binextra \
+    collection-fontsrecommended \
+    collection-fontutils \
+    collection-formatsextra \
+    collection-games \
+    collection-humanities \
+    collection-langenglish \
+    collection-latex \
+    collection-latexextra \
+    collection-latexrecommended \
+    collection-mathscience \
+    collection-music \
+    collection-pictures \
+    collection-plaingeneric \
+    collection-pstricks \
+    collection-publishers
+
+# Install everything
+FROM default as full
 
 # Some packages (ConTeXt) fail to install when relying on symlinks
 RUN export PATH="$(ls -d /usr/local/texlive/*/bin/x86_64-linux/):$PATH" && \

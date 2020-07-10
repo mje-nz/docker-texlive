@@ -27,9 +27,9 @@ WORKDIR /workdir
 
 
 # System TeX Live (without recommended packages or documentation)
-FROM base AS minimal
+FROM base AS basic
 RUN apt-get update && \
-    echo "Installing minimal system TeX Live" && \
+    echo "Installing basic system TeX Live" && \
     apt-get install -qy --no-install-recommends \
         latexmk \
         texlive && \
@@ -51,6 +51,6 @@ RUN apt-get update && \
 # System TeX Live (full)
 FROM base AS full
 RUN apt-get update && \
-    echo "Installing system TeX Live" && \
+    echo "Installing full system TeX Live" && \
     apt-get install -qy texlive-full && \
     rm -rf /var/lib/apt/lists/*

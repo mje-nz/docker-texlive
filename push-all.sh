@@ -9,6 +9,7 @@ source util.sh
 # Add short tags if possible
 trace docker tag "mjenz/texlive:$LATEST_UBUNTU" "mjenz/texlive:latest" || true
 trace docker tag "mjenz/texlive:$DISTRO-vanilla-$LATEST_TEXLIVE" "mjenz/texlive:$DISTRO-vanilla" || true
+trace docker tag "mjenz/texlive:$DISTRO-vanilla-$LATEST_TEXLIVE-full" "mjenz/texlive:$DISTRO-vanilla-full" || true
 trace docker tag "mjenz/texlive:$LATEST_UBUNTU-vanilla" "mjenz/texlive:vanilla" || true
 trace docker images mjenz/texlive
 
