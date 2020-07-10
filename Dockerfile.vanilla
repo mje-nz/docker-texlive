@@ -18,11 +18,9 @@ RUN apt-get update && \
     if [ -z "$TEXLIVE_VERSION" -o "$TEXLIVE_VERSION" = "$LATEST_TEXLIVE" ]; then \
         echo "Getting installer for latest vanilla TeX Live"; \
         export TEXLIVE_REPO="http://mirror.ctan.org/systems/texlive/tlnet"; \
-        export TEXLIVE_PATH="/usr/local/texlive/$LATEST_TEXLIVE/bin/x86_64-linux"; \
     else \
         echo "Getting installer for TeX Live $TEXLIVE_VERSION"; \
         export TEXLIVE_REPO="http://ftp.math.utah.edu/pub/tex/historic/systems/texlive/$TEXLIVE_VERSION/tlnet-final"; \
-        export TEXLIVE_PATH="/usr/local/texlive/$TEXLIVE_VERSION/bin/x86_64-linux"; \
     fi && \
     wget -nv $TEXLIVE_REPO/install-tl-unx.tar.gz && \
     # Extract installer into generically-named folder
