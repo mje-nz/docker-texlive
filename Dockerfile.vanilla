@@ -76,7 +76,6 @@ RUN tlmgr install \
     collection-games \
     collection-humanities \
     collection-langenglish \
-    collection-latex \
     collection-latexextra \
     collection-latexrecommended \
     collection-mathscience \

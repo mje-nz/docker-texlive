@@ -2,7 +2,7 @@
 # Build an image variant.  Expects at least DISTRO to be set, optionally also
 # NAME and TEXLIVE_VERSION.
 
-set -e
+set -ex
 
 source util.sh
 
@@ -11,20 +11,9 @@ if [ -z "$DISTRO" ]; then
     exit 1
 fi
 
-if [ -n "$TEXLIVE_VERSION" ]; then
-    texlive_arg="--build-arg TEXLIVE_VERSION=$TEXLIVE_VERSION"
-fi
-
-if [ -n "$NAME" ]; then
-    cache_from_arg="--cache-from $NAME-full"
-fi
-
-trace docker build "$cache_from_arg" "$texlive_arg" \
-    --build-arg "BASE_IMAGE=ubuntu:$DISTRO" \
-    "$@"
-
 get_tag_from_arguments() {
 # https://stackoverflow.com/a/34536611
+# only works if -t argument is before --target
     while :; do
         while getopts ":t:" opt; do
             case ${opt} in
@@ -41,9 +30,24 @@ get_tag_from_arguments() {
         [ $OPTIND -gt $# ] && break
     done
 }
-
-# Print versions, except when building the base image
 tag="$(get_tag_from_arguments "$@")"
-if [[ -n "$NAME" && "$tag" == "$NAME"* ]]; then
+[ "$tag" == "base" ] && is_building_base=true
+
+if [ ! $is_building_base ]; then
+    if [ -n "$TEXLIVE_VERSION" ] && [ "$TEXLIVE_VERSION" != "system" ]; then
+        dockerfile_arg="--file Dockerfile.vanilla"
+        texlive_arg="--build-arg TEXLIVE_VERSION=$TEXLIVE_VERSION"
+    fi
+
+    if [ -n "$NAME" ]; then
+        cache_from_arg="--cache-from $NAME-full"
+    fi
+fi
+
+trace docker build "$dockerfile_arg" "$texlive_arg" "$cache_from_arg" \
+    --build-arg "BASE_IMAGE=ubuntu:$DISTRO" \
+    "$@"
+
+if [ ! $is_building_base ]; then
     print_versions "$tag"
 fi
