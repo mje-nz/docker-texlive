@@ -1,4 +1,6 @@
 # TeX Live Docker image
+![Build Docker images](https://github.com/mje-nz/docker-texlive/workflows/Build%20Docker%20images/badge.svg)
+
 This repo builds a series of TeX Live images.
 There is a CI pipeline which does a clean build once a week.
 Each variant is available for `focal`, `bionic`, and `xenial`, and consists of an Ubuntu base image with system Python 3 and the latest matplotlib, numpy, and seaborn from pip.
