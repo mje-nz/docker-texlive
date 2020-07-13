@@ -2,7 +2,7 @@
 # Build an image variant.  Expects at least DISTRO to be set, optionally also
 # NAME and TEXLIVE_VERSION.
 
-set -ex
+set -e
 
 source util.sh
 
