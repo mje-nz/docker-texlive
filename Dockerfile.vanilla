@@ -60,6 +60,8 @@ RUN apt-get update && \
         upquote \
         xcolor \
         xstring && \
+    # Add symlinks
+    tlmgr path add && \
     # Clean up
     rm -r /tmp/install-tl-unx /tmp/common.sh && \
     rm install-tl-unx.tar.gz
@@ -83,11 +85,13 @@ RUN tlmgr install \
     collection-pictures \
     collection-plaingeneric \
     collection-pstricks \
-    collection-publishers
+    collection-publishers && \
+    tlmgr path add
 
 # Install everything
 FROM default as full
 
 # Some packages (ConTeXt) fail to install when relying on symlinks
 RUN export PATH="$(ls -d /usr/local/texlive/*/bin/x86_64-linux/):$PATH" && \
-    tlmgr install scheme-full
+    tlmgr install scheme-full && \
+    tlmgr path add
