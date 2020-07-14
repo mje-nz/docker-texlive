@@ -11,7 +11,7 @@ Image variants:
 * **`$distro-basic`**: `ubuntu:$distro` with TeX Live installed through apt without recommended packages
 * **`$distro`**: `$distro-basic` plus recommended packages
 * **`$distro-full`**: `ubuntu:$distro` with the `texlive-full` package
-* **`$distro-vanilla-$year-basic`**: `ubuntu:$distro` with vanilla TeX Live `$year` installed using the basic scheme plus some extra packages (minus documentation and sources)
+* **`$distro-vanilla-$year-basic`**: `ubuntu:$distro` with vanilla TeX Live `$year` installed using the basic scheme (minus documentation and sources)
 * **`$distro-vanilla-$year`**: `$distro-vanilla-$year-basic` plus basically all the LaTeX packages except extra fonts and non-English languages (minus documentation and sources)
 * **`$distro-vanilla-$year-full`**: `$distro-vanilla-$year` plus the rest of TeX Live (minus documentation and sources)
 

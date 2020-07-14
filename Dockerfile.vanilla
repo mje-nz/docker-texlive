@@ -46,24 +46,7 @@ RUN cd /tmp && \
     # Clean up
     rm -r /tmp/install-tl-unx /tmp/common.sh && \
     rm install-tl-unx.tar.gz
-RUN tlmgr install \
-        caption \
-        currfile \
-        etoolbox \
-        fancyvrb \
-        filehook \
-        fvextra \
-        latexmk \
-        lineno \
-        pgf \
-        pgfopts \
-        pythontex \
-        subfig \
-        upquote \
-        xcolor \
-        xstring && \
-    # Add symlinks
-    tlmgr path add
+
 
 
 # Install everything except extra fonts, non-English languages, and non-LaTeX processors
