@@ -18,9 +18,17 @@ RUN apt-get update && \
     # For matplotlib
         fontconfig \
         python3-tk && \
-    rm -rf /var/lib/apt/lists/* && \
-    # (system versions are old)
-    pip3 install --no-cache-dir --upgrade pip setuptools wheel
+    # Install newer python and pip
+    # (installing python3.8 without python3 is too much of a pain)
+    ( \
+        # Bionic
+        apt-get install -qy --no-install-recommends python3.8 && \
+        update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1 || \
+        true \
+    ) && \
+    pip3 install --no-cache-dir --upgrade pip setuptools wheel && \
+    # Clean up
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workdir
 
