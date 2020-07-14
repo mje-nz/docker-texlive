@@ -12,8 +12,9 @@ RUN apt-get update && \
         gnupg \
         perl \
         wget && \
-    rm -rf /var/lib/apt/lists/* && \
-    cd /tmp && \
+    rm -rf /var/lib/apt/lists/*
+RUN cd /tmp && \
+    # Get installer
     . ./common.sh && \
     if [ -z "$TEXLIVE_VERSION" -o "$TEXLIVE_VERSION" = "$LATEST_TEXLIVE" ]; then \
         echo "Getting installer for latest vanilla TeX Live"; \
@@ -42,11 +43,12 @@ RUN apt-get update && \
         -scheme basic \
         -profile install-tl-unx/texlive.profile \
         -repository $TEXLIVE_REPO && \
-    # Add some extra packages
-    tlmgr install \
+    # Clean up
+    rm -r /tmp/install-tl-unx /tmp/common.sh && \
+    rm install-tl-unx.tar.gz
+RUN tlmgr install \
         caption \
         currfile \
-        ec \
         etoolbox \
         fancyvrb \
         filehook \
@@ -61,10 +63,7 @@ RUN apt-get update && \
         xcolor \
         xstring && \
     # Add symlinks
-    tlmgr path add && \
-    # Clean up
-    rm -r /tmp/install-tl-unx /tmp/common.sh && \
-    rm install-tl-unx.tar.gz
+    tlmgr path add
 
 
 # Install everything except extra fonts, non-English languages, and non-LaTeX processors
