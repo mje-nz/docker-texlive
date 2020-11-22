@@ -35,7 +35,7 @@ jobs:
           NAME="$NAME-vanilla-$TEXLIVE_VERSION"
         fi
         echo "NAME=$NAME"
-        echo "::set-env name=NAME::$NAME"
+        echo "NAME=$NAME" >> $GITHUB_ENV
     - name: Pull previous image for cache
       if: github.event_name == 'push'
       run: docker pull "$NAME-full"
