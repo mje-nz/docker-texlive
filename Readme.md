@@ -4,7 +4,7 @@
 This repo builds a set of TeX Live images.
 There is a CI pipeline which does a clean build once a week.
 Each variant is based on Ubuntu (`focal`, `bionic`, or `xenial`) with system Python 3 and just enough pre-requisites to pip-install scipy.
-The vanilla variants are available for `2020` and `2019`.
+The vanilla variants are available for `2021`, `2020` and `2019`.
 
 Image variants:
 
@@ -20,9 +20,9 @@ Short tags:
 * **`basic`** is `focal-basic`
 * **`latest`** is `focal`
 * **`full`** is `focal-full`
-* **`vanilla-basic`** is `focal-vanilla-2020-basic`
-* **`vanilla`** is `focal-vanilla-2020`
-* **`vanilla-full`** is `focal-vanilla-2020-full`
-* **`$distro-vanilla-basic`** is `$distro-vanilla-2020-basic`
-* **`$distro-vanilla`** is `$distro-vanilla-2020`
-* **`$distro-vanilla-full`** is `$distro-vanilla-2020-full`
+* **`vanilla-basic`** is `focal-vanilla-2021-basic`
+* **`vanilla`** is `focal-vanilla-2021`
+* **`vanilla-full`** is `focal-vanilla-2021-full`
+* **`$distro-vanilla-basic`** is `$distro-vanilla-2021-basic`
+* **`$distro-vanilla`** is `$distro-vanilla-2021`
+* **`$distro-vanilla-full`** is `$distro-vanilla-2021-full`

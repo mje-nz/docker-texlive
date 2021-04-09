@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         distro: [xenial, bionic, focal]
-        texlive_version: [system, 2019, 2020]
+        texlive_version: [system, 2019, 2020, 2021]
     env:
       DISTRO: ${{ matrix.distro }}
       TEXLIVE_VERSION: ${{ matrix.TEXLIVE_VERSION }}
