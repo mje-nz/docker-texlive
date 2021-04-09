@@ -39,6 +39,7 @@ jobs:
     - name: Pull previous image for cache
       if: github.event_name == 'push'
       run: docker pull "$NAME-full"
+      continue-on-error: true
     - run: ./build.sh -t base --target base .
     - run: ./build.sh -t "$NAME-basic" --target basic .
     - run: ./build.sh -t "$NAME" --target default .
