@@ -4,7 +4,7 @@ on:
   push:
   schedule:
     # Every Sunday
-    - cron:  '0 0 * * 0'
+    - cron: '0 0 * * 0'
 
 jobs:
   build:
@@ -18,30 +18,30 @@ jobs:
       DISTRO: ${{ matrix.distro }}
       TEXLIVE_VERSION: ${{ matrix.TEXLIVE_VERSION }}
     steps:
-    - name: Display environment
-      run: env | sort
-    - name: Check out
-      uses: actions/checkout@v2
-    - name: Log in to Docker Hub
-      uses: azure/docker-login@v1
-      with:
-        username: mjenz
-        password: ${{ secrets.DOCKERIO_PASSWORD }}
+      - name: Display environment
+        run: env | sort
+      - name: Check out
+        uses: actions/checkout@v2
+      - name: Log in to Docker Hub
+        uses: azure/docker-login@v1
+        with:
+          username: mjenz
+          password: ${{ secrets.DOCKERIO_PASSWORD }}
 
-    - name: Format name
-      run: |
-        NAME="mjenz/texlive:$DISTRO"
-        if [[ "$TEXLIVE_VERSION" != "system" ]]; then
-          NAME="$NAME-vanilla-$TEXLIVE_VERSION"
-        fi
-        echo "NAME=$NAME"
-        echo "NAME=$NAME" >> $GITHUB_ENV
-    - name: Pull previous image for cache
-      if: github.event_name == 'push'
-      run: docker pull "$NAME-full"
-      continue-on-error: true
-    - run: ./build.sh -t base --target base .
-    - run: ./build.sh -t "$NAME-basic" --target basic .
-    - run: ./build.sh -t "$NAME" --target default .
-    - run: ./build.sh -t "$NAME-full" --target full --cache-from "$NAME" .
-    - run: ./push-all.sh
+      - name: Format name
+        run: |
+          NAME="mjenz/texlive:$DISTRO"
+          if [[ "$TEXLIVE_VERSION" != "system" ]]; then
+            NAME="$NAME-vanilla-$TEXLIVE_VERSION"
+          fi
+          echo "NAME=$NAME"
+          echo "NAME=$NAME" >> $GITHUB_ENV
+      - name: Pull previous image for cache
+        if: github.event_name == 'push'
+        run: docker pull "$NAME-full"
+        continue-on-error: true
+      - run: ./build.sh -t base --target base .
+      - run: ./build.sh -t "$NAME-basic" --target basic .
+      - run: ./build.sh -t "$NAME" --target default .
+      - run: ./build.sh -t "$NAME-full" --target full --cache-from "$NAME" .
+      - run: ./push-all.sh
