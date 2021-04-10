@@ -19,7 +19,7 @@ RUN cd /tmp && \
     if [ -z "$TEXLIVE_VERSION" -o "$TEXLIVE_VERSION" = "$LATEST_TEXLIVE" ]; then \
         echo "Getting installer for latest vanilla TeX Live"; \
         export TEXLIVE_REPO="http://mirror.ctan.org/systems/texlive/tlnet"; \
-    elif ["$TEXLIVE_VERSION" = "2020" ]; then \
+    elif [ "$TEXLIVE_VERSION" = "2020" ]; then \
         # No tlnet-final folder for 2020 (yet?)
         echo "Getting installer for TeX Live 2020"; \
         export TEXLIVE_REPO="http://ftp.math.utah.edu/pub/tex/historic/systems/texlive/2020/"; \
