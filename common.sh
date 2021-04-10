@@ -1,2 +1,3 @@
+# shellcheck disable=SC2034
 LATEST_UBUNTU=focal
 LATEST_TEXLIVE=2021

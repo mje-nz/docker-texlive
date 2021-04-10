@@ -13,10 +13,11 @@ RUN apt-get update && \
         perl \
         wget && \
     rm -rf /var/lib/apt/lists/*
+# hadolint ignore=DL3003,SC1091
 RUN cd /tmp && \
     # Get installer
     . ./common.sh && \
-    if [ -z "$TEXLIVE_VERSION" -o "$TEXLIVE_VERSION" = "$LATEST_TEXLIVE" ]; then \
+    if [ -z "$TEXLIVE_VERSION" ] || [ "$TEXLIVE_VERSION" = "$LATEST_TEXLIVE" ]; then \
         echo "Getting installer for latest vanilla TeX Live"; \
         export TEXLIVE_REPO="http://mirror.ctan.org/systems/texlive/tlnet"; \
     elif [ "$TEXLIVE_VERSION" = "2020" ]; then \
@@ -78,6 +79,7 @@ RUN tlmgr install \
 FROM default as full
 
 # Some packages (ConTeXt) fail to install when relying on symlinks
-RUN export PATH="$(ls -d /usr/local/texlive/*/bin/x86_64-linux/):$PATH" && \
+RUN PATH="$(ls -d /usr/local/texlive/*/bin/x86_64-linux/):$PATH" && \
+    export PATH && \
     tlmgr install scheme-full && \
     tlmgr path add

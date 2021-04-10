@@ -27,7 +27,7 @@ get_tag_from_arguments() {
             esac
         done
         ((OPTIND++))
-        [ $OPTIND -gt $# ] && break
+        [ "$OPTIND" -gt $# ] && break
     done
 }
 tag="$(get_tag_from_arguments "$@")"

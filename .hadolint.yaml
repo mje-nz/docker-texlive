@@ -1,0 +1,7 @@
+ignored:
+  # Always tag the version of an image explicitly.
+  - DL3006
+  # Pin versions in apt-get install.
+  - DL3008
+  # Pin versions in pip.
+  - DL3013

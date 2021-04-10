@@ -26,3 +26,9 @@ Short tags:
 * **`$distro-vanilla-basic`** is `$distro-vanilla-2021-basic`
 * **`$distro-vanilla`** is `$distro-vanilla-2021`
 * **`$distro-vanilla-full`** is `$distro-vanilla-2021-full`
+
+
+
+TODO:
+
+* Add v8r
